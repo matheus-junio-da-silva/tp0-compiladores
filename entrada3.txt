@@ -1,0 +1,5 @@
+O servidor 192.168.0.1 esta rodando meu banco de dados.
+Acesse o sistema em https://www.universidade-ufv.br/aluno/portal para pegar seu codigo.
+No arquivo main.c, mudei a int contador_global para 10.
+Minha tag preferida no web eh <div> pra dar espacos.
+O professor disse: "Parabens pelo excelente trabalho em Compiladores!"

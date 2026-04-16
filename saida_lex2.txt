@@ -1,0 +1,6 @@
+Foi encontrado um CPF. LEXEMA: 123.456.789-00
+Foi encontrado um email. LEXEMA: aluno.ufv@ufv.br
+Foi encontrado um horario. LEXEMA: 10:30
+Foi encontrada uma data. LEXEMA: 15/04/2026
+Foi encontrado um valor em Reais. LEXEMA: R$ 15,50
+Foi encontrado um valor em Reais. LEXEMA: R$10

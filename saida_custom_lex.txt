@@ -1,0 +1,9 @@
+Foi encontrado um numero com parte decimal. LEXEMA: 1.5
+Foi encontrado um numero inteiro positivo. LEXEMA: +123
+Foi encontrado um numero inteiro negativo. LEXEMA: -14
+Foi encontrado uma placa. LEXEMA: ABC-1234
+Foi encontrado um nome proprio. LEXEMA: Joao Pedro da Silva
+Foi encontrado um telefone. LEXEMA: 1234-5678
+Foi encontrado uma palavra. LEXEMA: teste
+Foi encontrado uma palavra. LEXEMA: separado
+Foi encontrado um nome proprio. LEXEMA: Joao Maria Jose testando
