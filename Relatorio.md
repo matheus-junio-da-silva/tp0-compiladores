@@ -9,7 +9,7 @@ Este relatório descreve o desenvolvimento de dois analisadores léxicos utiliza
 ## 2. Decisões de Implementação: lex.l
 Para o arquivo `lex.l`, a ordem dos padrões foi um ponto crucial para evitar conflitos de casamento em expressões que podem ser ambíguas. O flex utiliza o princípio do _"maximal munch"_ (reconhece o padrão com a maior quantidade de caracteres lidos). No entanto, para padrões que podem ter tamanhos iguais, a ordem declarada no arquivo dita a prioridade (a primeira regra descrita tem preferência). 
 
-As expressões regulares foram construídas e organizadas na seguinte prioridade:
+As expressões regulares foram construídas e organizadas na seguinte prioridade:  
 1. **Placa (`[A-Z]{3}-[0-9]{4}`)**: Definida primeiro, para já isolar o formato completo.  
 2. **Telefone (`[0-9]{4}-[0-9]{4}`)**: Definido nesta posição pelo seu tamanho rígido (9 caracteres), evitando que o traço conflite com o sinal de número negativo de forma isolada.  
 3. **Nome próprio (`[a-zA-Z]+( [a-zA-Z]+){2,3}`)**: Exige de 3 a 4 palavras contendo apenas 1 espaço entre elas. Ela foi colocada logo aqui pelo risco de sobreposição, o que poderia fragmentar os nomes caso a regra de Palavra viesse antes.  
@@ -95,12 +95,12 @@ int main(void)
 ## 3. Decisões de Implementação: lex2.l
 Para o meu segundo analisador (`lex2.l`), eu resolvi adicionar cinco tokens práticos e frequentes em nossas atividades rotineiras, como extração de dados comuns na internet ou manipulação de mensagens.
 
-Os padrões definidos foram:
-1. **CPF (`[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}`)**: Padrão rígido com pontuações limitadas exigidas.
-2. **E-mail (`[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}`)**: Agrupamento alfanumérico antes do `@`, seguido pelo domínio e uma extensão contendo pelo menos duas letras (`.br`, `.com`). 
-3. **Data (`(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/[0-9]{4}`)**: Regra para datas em formato DD/MM/AAAA.
-4. **Horário (`[0-2][0-9]:[0-5][0-9]`)**: Expressão que respeita as dezenas dos relógios e de minutos.
-5. **Valor Monetário em Reais (`[R][\$][ ]?[0-9]+(,[0-9]{2})?`)**: Permitindo captar dinheiros grafados com ou sem separação por espaço.
+Os padrões definidos foram:  
+1. **CPF (`[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}`)**: Padrão rígido com pontuações limitadas exigidas.  
+2. **E-mail (`[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}`)**: Agrupamento alfanumérico antes do `@`, seguido pelo domínio e uma extensão contendo pelo menos duas letras (`.br`, `.com`).   
+3. **Data (`(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/[0-9]{4}`)**: Regra para datas em formato DD/MM/AAAA.  
+4. **Horário (`[0-2][0-9]:[0-5][0-9]`)**: Expressão que respeita as dezenas dos relógios e de minutos.  
+5. **Valor Monetário em Reais (`[R][\$][ ]?[0-9]+(,[0-9]{2})?`)**: Permitindo captar dinheiros grafados com ou sem separação por espaço.  
 
 ### 3.1 Exemplo de Teste para o lex2.l
 Criei uma string de teste para forçar e validar os padrões acima:
@@ -163,12 +163,12 @@ int main(void)
 ```
 
 ## 4. Analisador Léxico Adicional (Bônus): lex3.l
-Para demonstrar um maior domínio sobre as expressões regulares e a ferramenta Flex visando atingir nota máxima neste trabalho, decidi construir um terceiro arquivo (`lex3.l`). Ele foi focado em lexemas importantíssimos para a disciplina de compiladores e redes:
-1. **Endereços IPv4**: `[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`
-2. **URL (com protocolos, diretórios e afins)**: `(http|https):\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/[a-zA-Z0-9&%_.-]*)*`
-3. **Identificadores/Variáveis (C/Java)**: Letras podendo começar/ter underlines e números após a primeira letra - `[a-zA-Z_][a-zA-Z0-9_]*`
-4. **Strings com Aspas Duplas (que abrem e fecham corretamente)**: `\"([^\\\"]|\\.)*\"`
-5. **Tags HTML (abertura ou fechamento)**: `<[^>]+>`
+Para demonstrar um maior domínio sobre as expressões regulares e a ferramenta Flex visando atingir nota máxima neste trabalho, decidi construir um terceiro arquivo (`lex3.l`). Ele foi focado em lexemas importantíssimos para a disciplina de compiladores e redes:  
+1. **Endereços IPv4**: `[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`  
+2. **URL (com protocolos, diretórios e afins)**: `(http|https):\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/[a-zA-Z0-9&%_.-]*)*`  
+3. **Identificadores/Variáveis (C/Java)**: Letras podendo começar/ter underlines e números após a primeira letra - `[a-zA-Z_][a-zA-Z0-9_]*`  
+4. **Strings com Aspas Duplas (que abrem e fecham corretamente)**: `\"([^\\\"]|\\.)*\"`  
+5. **Tags HTML (abertura ou fechamento)**: `<[^>]+>`  
 
 ### 4.1 Exemplo de Teste para o lex3.l
 O arquivo `entrada3.txt` contém este script com sintaxe simulando casos de quebra:
@@ -235,3 +235,11 @@ int main(void)
     return 0;
 }
 ```
+
+## 5. Conclusão
+
+Esse trabalho foi bem mais interessante do que eu esperava quando li pela primeira vez. A parte que mais me surpreendeu foi perceber que pequenas decisões de ordem das regras mudam completamente o resultado, algo que parece óbvio depois que acontece, mas que você só entende de verdade quando testa e vê a saída errada.
+
+Construir o `lex2.l` do zero, escolhendo os padrões, foi o que mais me fez pensar. Tive que decidir o que fazia sentido reconhecer, montar as expressões regulares e ainda garantir que não havia conflito entre elas, o que me forçou a revisitar os conceitos de classes de caracteres, quantificadores e alternância de uma forma muito mais prática do que só ler sobre eles.
+
+No geral, o trabalho ajudou muito a fixar conceitos da análise léxica, e ficou claro por que essa etapa é importante antes de qualquer análise sintática.
