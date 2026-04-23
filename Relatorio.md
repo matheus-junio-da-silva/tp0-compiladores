@@ -4,7 +4,7 @@
 **Matrícula:** 5382
 
 ## 1. Introdução
-Este relatório descreve o desenvolvimento de dois analisadores léxicos utilizando a ferramenta `flex`. O objetivo principal é fixar os conceitos práticos de expressões regulares aplicadas ao reconhecimento de tokens, prioridade de casamento de padrões e ações associadas.
+Este relatório descreve o desenvolvimento de três analisadores léxicos utilizando a ferramenta `flex`. O objetivo principal é fixar os conceitos práticos de expressões regulares aplicadas ao reconhecimento de tokens, prioridade de casamento de padrões e ações associadas.
 
 ## 2. Decisões de Implementação: lex.l
 Para o arquivo `lex.l`, a ordem dos padrões foi um ponto crucial para evitar conflitos de casamento em expressões que podem ser ambíguas. O flex utiliza o princípio do _"maximal munch"_ (reconhece o padrão com a maior quantidade de caracteres lidos). No entanto, para padrões que podem ter tamanhos iguais, a ordem declarada no arquivo dita a prioridade (a primeira regra descrita tem preferência). 
@@ -17,9 +17,45 @@ As expressões regulares foram construídas e organizadas na seguinte prioridade
 5. **Inteiro negativo (`-[0-9]+`)** e **Inteiro positivo (`\+?[0-9]+`)**: Focadas nos algarismos, diferenciadas pela presença (ou opcional) de operador.  
 6. **Palavra (`[a-zA-Z]+`)**: Caso geral que absorve as palavras e pedaços de strings que sobraram.  
 
-Ao testar a entrada (`entrada.txt`) do respectivo enunciado, obtive a saída exata proposta, validando as construções sem fragmentação das strings maiores. Além das expressões, adicionei a regra de escape `.` caso algo inesperado ocorra, para que o programa não crash e ignore caracteres sujados.
+### 2.1 Teste com o Exemplo da Especificação
 
-### 2.1 Exemplo de Teste Próprio para o lex.l
+Compilei e executei o analisador com a entrada de exemplo fornecida no enunciado (`entrada.txt`) e a saída obtida foi **exatamente igual** à esperada, linha por linha.
+
+**Entrada utilizada (`entrada.txt`):**
+```text
+875878 -3355456 abc5464     abc-5464 ABC-5464 	453-2345 9486-0847
+Daniel Mendes Barbosa 32.345 	Palavra Qualquer 3567-3224
+Daniel Mendes Barbosa Daniel Mendes Barbosa    Menezes200
+```
+
+**Saída gerada pelo analisador:**
+```text
+Foi encontrado um numero inteiro positivo. LEXEMA: 875878
+Foi encontrado um numero inteiro negativo. LEXEMA: -3355456
+Foi encontrado uma palavra. LEXEMA: abc
+Foi encontrado um numero inteiro positivo. LEXEMA: 5464
+Foi encontrado uma palavra. LEXEMA: abc
+Foi encontrado um numero inteiro negativo. LEXEMA: -5464
+Foi encontrado uma placa. LEXEMA: ABC-5464
+Foi encontrado um numero inteiro positivo. LEXEMA: 453
+Foi encontrado um numero inteiro negativo. LEXEMA: -2345
+Foi encontrado um telefone. LEXEMA: 9486-0847
+Foi encontrado um nome proprio. LEXEMA: Daniel Mendes Barbosa
+Foi encontrado um numero com parte decimal. LEXEMA: 32.345
+Foi encontrado uma palavra. LEXEMA: Palavra
+Foi encontrado uma palavra. LEXEMA: Qualquer
+Foi encontrado um telefone. LEXEMA: 3567-3224
+Foi encontrado um nome proprio. LEXEMA: Daniel Mendes Barbosa Daniel
+Foi encontrado uma palavra. LEXEMA: Mendes
+Foi encontrado uma palavra. LEXEMA: Barbosa
+Foi encontrado uma palavra. LEXEMA: Menezes
+Foi encontrado um numero inteiro positivo. LEXEMA: 200
+```
+
+Além dos padrões principais, adicionei a regra de escape `.` para que caracteres inesperados sejam ignorados silenciosamente, sem travar o programa.
+
+
+### 2.2 Exemplo de Teste Próprio para o lex.l
 Conforme exigido na especificação, criei um arquivo de entrada próprio para avaliar as prioridades nomeado `entrada_custom_lex.txt`:
 ```text
 1.5 +123 -14 ABC-1234
@@ -44,7 +80,7 @@ Foi encontrado um nome proprio. LEXEMA: Joao Maria Jose testando
 Notei que caracteres compostos que não possuem regras adequadas (como o traço solto ligando palavras não numéricas em `teste-separado`) foram sabiamente ignorados pelo nosso tratador genérico final `.`, sem causar travamento e permitindo que a regra "*Palavra*" identificasse normalmente `teste` e depois `separado`. Da mesma forma, as strings contendo 3 nomes exatos de um lado e 4 do outro foram processadas pela mesma regra respeitando a quantificação `{2,3}` de espaços definida. É importante frisar que, respeitando a especificação do trabalho, as verificações acima não levam `ç` ou acentos, pois se levassem a expressão não funcionaria, dado que está limitada unicamente a palavras do alfabeto puro sem acento.
 
 
-### 2.2 Código Fonte do `lex.l`
+### 2.3 Código Fonte do `lex.l`
 ```lex
 %{
 #include <stdio.h>
@@ -60,7 +96,7 @@ ws          {delim}+
 
 placa       [A-Z]{3}-[0-9]{4}
 telefone    [0-9]{4}-[0-9]{4}
-nome        [a-zA-Z]+( [a-zA-Z]+){2,3}
+nome        [a-zA-Z]+([ ][a-zA-Z]+){2,3}
 decimal     [-+]?[0-9]+\.[0-9]+
 inteiro_neg -[0-9]+
 inteiro_pos \+?[0-9]+
@@ -163,7 +199,7 @@ int main(void)
 ```
 
 ## 4. Analisador Léxico Adicional (Bônus): lex3.l
-Para demonstrar um maior domínio sobre as expressões regulares e a ferramenta Flex visando atingir nota máxima neste trabalho, decidi construir um terceiro arquivo (`lex3.l`). Ele foi focado em lexemas importantíssimos para a disciplina de compiladores e redes:  
+Para demonstrar um maior domínio sobre as expressões regulares e a ferramenta Flex visando atingir nota máxima neste trabalho, decidi construir um terceiro arquivo (`lex3.l`). Ele foi focado em lexemas importantes para a disciplina de compiladores e redes:  
 1. **Endereços IPv4**: `[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`  
 2. **URL (com protocolos, diretórios e afins)**: `(http|https):\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/[a-zA-Z0-9&%_.-]*)*`  
 3. **Identificadores/Variáveis (C/Java)**: Letras podendo começar/ter underlines e números após a primeira letra - `[a-zA-Z_][a-zA-Z0-9_]*`  
@@ -186,13 +222,43 @@ A execução do gerado reconheceu exatamente os pontos delicados.
 Foi encontrada uma Variavel. LEXEMA: O
 Foi encontrada uma Variavel. LEXEMA: servidor
 Foi encontrado um IPv4. LEXEMA: 192.168.0.1
-... (outras variáveis normais capturadas perfeitamente) ...
+Foi encontrada uma Variavel. LEXEMA: esta
+Foi encontrada uma Variavel. LEXEMA: rodando
+Foi encontrada uma Variavel. LEXEMA: meu
+Foi encontrada uma Variavel. LEXEMA: banco
+Foi encontrada uma Variavel. LEXEMA: de
+Foi encontrada uma Variavel. LEXEMA: dados
+Foi encontrada uma Variavel. LEXEMA: Acesse
+Foi encontrada uma Variavel. LEXEMA: o
+Foi encontrada uma Variavel. LEXEMA: sistema
+Foi encontrada uma Variavel. LEXEMA: em
 Foi encontrada uma URL. LEXEMA: https://www.universidade-ufv.br/aluno/portal
-...
+Foi encontrada uma Variavel. LEXEMA: para
+Foi encontrada uma Variavel. LEXEMA: pegar
+Foi encontrada uma Variavel. LEXEMA: seu
+Foi encontrada uma Variavel. LEXEMA: codigo
+Foi encontrada uma Variavel. LEXEMA: No
+Foi encontrada uma Variavel. LEXEMA: arquivo
+Foi encontrada uma Variavel. LEXEMA: main
+Foi encontrada uma Variavel. LEXEMA: c
+Foi encontrada uma Variavel. LEXEMA: mudei
+Foi encontrada uma Variavel. LEXEMA: a
+Foi encontrada uma Variavel. LEXEMA: int
 Foi encontrada uma Variavel. LEXEMA: contador_global
-...
+Foi encontrada uma Variavel. LEXEMA: para
+Foi encontrada uma Variavel. LEXEMA: Minha
+Foi encontrada uma Variavel. LEXEMA: tag
+Foi encontrada uma Variavel. LEXEMA: preferida
+Foi encontrada uma Variavel. LEXEMA: no
+Foi encontrada uma Variavel. LEXEMA: web
+Foi encontrada uma Variavel. LEXEMA: eh
 Foi encontrada uma Tag HTML. LEXEMA: <div>
-...
+Foi encontrada uma Variavel. LEXEMA: pra
+Foi encontrada uma Variavel. LEXEMA: dar
+Foi encontrada uma Variavel. LEXEMA: espacos
+Foi encontrada uma Variavel. LEXEMA: O
+Foi encontrada uma Variavel. LEXEMA: professor
+Foi encontrada uma Variavel. LEXEMA: disse
 Foi encontrada uma String. LEXEMA: "Parabens pelo excelente trabalho em Compiladores!"
 ```
 Note que as palavras normais em um texto comum foram lidas através da regra de identificador (*variável*), que as identificou validamente como tal seguindo a semântica em Compiladores e interpretadores gerais. Pontuações espalhadas (`.`, `,`) caíram no filtro genérico, preservando integridade, enquanto cadeias mais complexas como o IP em blocos, a URL completa com subtipos, ou a String com símbolos internos embutida dentro de aspas não quebraram nos espaços contidos!
@@ -219,6 +285,7 @@ tag_html    <[^>]+>
 %%
 
 {ws}                { /* nenhuma acao */ }
+
 {ipv4}              { printf("Foi encontrado um IPv4. LEXEMA: %s\n", yytext); }
 {url}               { printf("Foi encontrada uma URL. LEXEMA: %s\n", yytext); }
 {tag_html}          { printf("Foi encontrada uma Tag HTML. LEXEMA: %s\n", yytext); }
@@ -240,6 +307,6 @@ int main(void)
 
 Esse trabalho foi bem mais interessante do que eu esperava quando li pela primeira vez. A parte que mais me surpreendeu foi perceber que pequenas decisões de ordem das regras mudam completamente o resultado, algo que parece óbvio depois que acontece, mas que você só entende de verdade quando testa e vê a saída errada.
 
-Construir o `lex2.l` do zero, escolhendo os padrões, foi o que mais me fez pensar. Tive que decidir o que fazia sentido reconhecer, montar as expressões regulares e ainda garantir que não havia conflito entre elas, o que me forçou a revisitar os conceitos de classes de caracteres, quantificadores e alternância de uma forma muito mais prática do que só ler sobre eles.
+Construir o `lex2.l` e `lex3.l` do zero, escolhendo os padrões, foi o que mais me fez pensar. Tive que decidir o que fazia sentido reconhecer, montar as expressões regulares e ainda garantir que não havia conflito entre elas, o que me forçou a revisitar os conceitos de classes de caracteres, quantificadores e alternância de uma forma muito mais prática do que só ler sobre eles.
 
 No geral, o trabalho ajudou muito a fixar conceitos da análise léxica, e ficou claro por que essa etapa é importante antes de qualquer análise sintática.
