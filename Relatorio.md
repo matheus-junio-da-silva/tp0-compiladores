@@ -10,12 +10,12 @@ Este relatório descreve o desenvolvimento de dois analisadores léxicos utiliza
 Para o arquivo `lex.l`, a ordem dos padrões foi um ponto crucial para evitar conflitos de casamento em expressões que podem ser ambíguas. O flex utiliza o princípio do _"maximal munch"_ (reconhece o padrão com a maior quantidade de caracteres lidos). No entanto, para padrões que podem ter tamanhos iguais, a ordem declarada no arquivo dita a prioridade (a primeira regra descrita tem preferência). 
 
 As expressões regulares foram construídas e organizadas na seguinte prioridade:
-1. **Placa (`[A-Z]{3}-[0-9]{4}`)**: Definida primeiro, para já isolar o formato completo.
-2. **Telefone (`[0-9]{4}-[0-9]{4}`)**: Definido nesta posição pelo seu tamanho rígido (9 caracteres), evitando que o traço conflite com o sinal de número negativo de forma isolada.
-3. **Nome próprio (`[a-zA-Z]+( [a-zA-Z]+){2,3}`)**: Exige de 3 a 4 palavras contendo apenas 1 espaço entre elas. Ela foi colocada logo aqui pelo risco de sobreposição, o que poderia fragmentar os nomes caso a regra de Palavra viesse antes.
-4. **Decimal (`[-+]?[0-9]+\.[0-9]+`)**: Regra que pode ou não possuir um sinal, é detectada antes dos inteiros por conter um caractere literal de ponto.
-5. **Inteiro negativo (`-[0-9]+`)** e **Inteiro positivo (`\+?[0-9]+`)**: Focadas nos algarismos, diferenciadas pela presença (ou opcional) de operador.
-6. **Palavra (`[a-zA-Z]+`)**: Caso geral que absorve as palavras e pedaços de strings que sobraram.
+1. **Placa (`[A-Z]{3}-[0-9]{4}`)**: Definida primeiro, para já isolar o formato completo.  
+2. **Telefone (`[0-9]{4}-[0-9]{4}`)**: Definido nesta posição pelo seu tamanho rígido (9 caracteres), evitando que o traço conflite com o sinal de número negativo de forma isolada.  
+3. **Nome próprio (`[a-zA-Z]+( [a-zA-Z]+){2,3}`)**: Exige de 3 a 4 palavras contendo apenas 1 espaço entre elas. Ela foi colocada logo aqui pelo risco de sobreposição, o que poderia fragmentar os nomes caso a regra de Palavra viesse antes.  
+4. **Decimal (`[-+]?[0-9]+\.[0-9]+`)**: Regra que pode ou não possuir um sinal, é detectada antes dos inteiros por conter um caractere literal de ponto.  
+5. **Inteiro negativo (`-[0-9]+`)** e **Inteiro positivo (`\+?[0-9]+`)**: Focadas nos algarismos, diferenciadas pela presença (ou opcional) de operador.  
+6. **Palavra (`[a-zA-Z]+`)**: Caso geral que absorve as palavras e pedaços de strings que sobraram.  
 
 Ao testar a entrada (`entrada.txt`) do respectivo enunciado, obtive a saída exata proposta, validando as construções sem fragmentação das strings maiores. Além das expressões, adicionei a regra de escape `.` caso algo inesperado ocorra, para que o programa não crash e ignore caracteres sujados.
 
@@ -41,7 +41,7 @@ Foi encontrado uma palavra. LEXEMA: teste
 Foi encontrado uma palavra. LEXEMA: separado
 Foi encontrado um nome proprio. LEXEMA: Joao Maria Jose testando
 ```
-Notei que caracteres compostos que não possuem regras adequadas (como o traço solto ligando palavras não numéricas em `teste-separado`) foram sabiamente ignorados pelo nosso tratador genérico final `.`, sem causar travamento e permitindo que a regra "*Palavra*" identificasse normalmente `teste` e depois `separado`. Da mesma forma, as strings contendo 3 nomes exatos de um lado e 4 do outro foram processadas pela mesma regra respeitando a quantificação `{2,3}` de espaços definida. É importante frisar que, respeitando o edital, as verificações acima não levam `ç` ou acentos, pois se levassem a expressão não funcionaria, dado que está limitada unicamente a palavras do alfabeto puro sem acento.
+Notei que caracteres compostos que não possuem regras adequadas (como o traço solto ligando palavras não numéricas em `teste-separado`) foram sabiamente ignorados pelo nosso tratador genérico final `.`, sem causar travamento e permitindo que a regra "*Palavra*" identificasse normalmente `teste` e depois `separado`. Da mesma forma, as strings contendo 3 nomes exatos de um lado e 4 do outro foram processadas pela mesma regra respeitando a quantificação `{2,3}` de espaços definida. É importante frisar que, respeitando a especificação do trabalho, as verificações acima não levam `ç` ou acentos, pois se levassem a expressão não funcionaria, dado que está limitada unicamente a palavras do alfabeto puro sem acento.
 
 
 ### 2.2 Código Fonte do `lex.l`
